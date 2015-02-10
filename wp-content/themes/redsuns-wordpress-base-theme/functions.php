@@ -137,6 +137,11 @@ require get_template_directory() . '/inc/customizer.php';
  */
 require get_template_directory() . '/inc/jetpack.php';
 
+/**
+ * Fragmentação de URL
+ */
+require get_template_directory() . '/inc/url-fragmentation.php';
+
 
 add_action('admin_menu', 'manual');
 
@@ -147,10 +152,10 @@ function manual()
 
 function manual_do_site()
 {
-    ?>
-    <br /><br />
-    <iframe width="100%" height="600" src="<?php echo get_home_url(); ?>/docs/manual.pdf"></iframe>
-    <?php
+    
+    echo '<br /><br />';
+    echo '<iframe width="100%" height="600" src="<?php echo get_home_url(); ?>/docs/manual.pdf"></iframe>';
+    
 }
 
 add_action('admin_bar_menu', 'add_toolbar_items', 100);
