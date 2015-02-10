@@ -12,7 +12,9 @@
         "php": ">=5.3.0",
         "wpackagist-plugin/advanced-custom-fields": "*",
         "wpackagist-plugin/contact-form-7": "*",
-        "wpackagist-plugin/wp-migrate-db" : "0.5"
+        "wpackagist-plugin/wp-migrate-db" : "0.5",
+        "wpackagist-plugin/wordpress-seo" : "*",
+        "wpackagist-plugin/wp-pagenavi": "*"
     },
     "repositories": [
         {
