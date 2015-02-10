@@ -136,3 +136,33 @@ require get_template_directory() . '/inc/customizer.php';
  * Load Jetpack compatibility file.
  */
 require get_template_directory() . '/inc/jetpack.php';
+
+
+add_action('admin_menu', 'manual');
+
+function manual()
+{
+    add_menu_page('Manual do Site', 'Manual do Site', 'manage_options', 'manual_do_site', 'manual_do_site', 'dashicons-book', 15);
+}
+
+function manual_do_site()
+{
+    ?>
+    <br /><br />
+    <iframe width="100%" height="600" src="<?php echo get_home_url(); ?>/docs/manual.pdf"></iframe>
+    <?php
+}
+
+add_action('admin_bar_menu', 'add_toolbar_items', 100);
+
+function add_toolbar_items($admin_bar)
+{
+    $admin_bar->add_menu(array(
+        'id' => 'manual',
+        'title' => 'Manual do Site',
+        'href' => '?page=manual_do_site',
+        'meta' => array(
+            'title' => __('Manual do Site'),
+        ),
+    ));
+}
