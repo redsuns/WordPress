@@ -170,7 +170,7 @@ function add_toolbar_items($admin_bar)
     $admin_bar->add_menu(array(
         'id' => 'manual',
         'title' => 'Manual do Site',
-        'href' => '?page=manual_do_site',
+        'href' => get_home_url() . '/wp-admin/admin.php?page=manual_do_site',
         'meta' => array(
             'title' => __('Manual do Site'),
         ),
