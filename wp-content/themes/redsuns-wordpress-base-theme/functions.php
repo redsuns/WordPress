@@ -74,6 +74,11 @@ function redsuns_wordpress_base_theme_setup() {
 		'default-color' => 'ffffff',
 		'default-image' => '',
 	) ) );
+    
+    add_theme_support('post-thumbnails');
+    
+    // Exemplo de registro de tamanho de thumbnails
+    // add_image_size('thumbnail-produto', 270, 225, true);
 }
 endif; // redsuns_wordpress_base_theme_setup
 add_action( 'after_setup_theme', 'redsuns_wordpress_base_theme_setup' );
