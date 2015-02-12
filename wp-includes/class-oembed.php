@@ -347,12 +347,12 @@ class WP_oEmbed {
 				}
 			}
 
-			if ( $tagfound && preg_match_all( '/<link([^<>]+)>/i', $html, $links ) ) {
+			if ( $tagfound && preg_match_all( '#<link([^<>]+)/?>#iU', $html, $links ) ) {
 				foreach ( $links[1] as $link ) {
 					$atts = shortcode_parse_atts( $link );
 
 					if ( !empty($atts['type']) && !empty($linktypes[$atts['type']]) && !empty($atts['href']) ) {
-						$providers[$linktypes[$atts['type']]] = $atts['href'];
+						$providers[$linktypes[$atts['type']]] = htmlspecialchars_decode( $atts['href'] );
 
 						// Stop here if it's JSON (that's all we need)
 						if ( 'json' == $linktypes[$atts['type']] )
@@ -559,10 +559,32 @@ class WP_oEmbed {
 	 * @return string Possibly modified $html
 	 */
 	public function _strip_newlines( $html, $data, $url ) {
-		if ( false !== strpos( $html, "\n" ) )
-			$html = str_replace( array( "\r\n", "\n" ), '', $html );
+		if ( false === strpos( $html, "\n" ) ) {
+			return $html;
+		}
 
-		return $html;
+		$count = 1;
+		$found = array();
+		$token = '__PRE__';
+		$search = array( "\t", "\n", "\r", ' ' );
+		$replace = array( '__TAB__', '__NL__', '__CR__', '__SPACE__' );
+		$tokenized = str_replace( $search, $replace, $html );
+
+		preg_match_all( '#(<pre[^>]*>.+?</pre>)#i', $tokenized, $matches, PREG_SET_ORDER );
+		foreach ( $matches as $i => $match ) {
+			$tag_html = str_replace( $replace, $search, $match[0] );
+			$tag_token = $token . $i;
+
+			$found[ $tag_token ] = $tag_html;
+			$html = str_replace( $tag_html, $tag_token, $html, $count );
+		}
+
+		$replaced = str_replace( $replace, $search, $html );
+		$stripped = str_replace( array( "\r\n", "\n" ), '', $replaced );
+		$pre = array_values( $found );
+		$tokens = array_keys( $found );
+
+		return str_replace( $tokens, $pre, $stripped );
 	}
 }
 
