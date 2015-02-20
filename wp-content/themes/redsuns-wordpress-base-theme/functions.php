@@ -147,6 +147,11 @@ require get_template_directory() . '/inc/jetpack.php';
  */
 require get_template_directory() . '/inc/url-fragmentation.php';
 
+/**
+ * Página de opções do painel administrativo
+ */
+require get_template_directory() . '/inc/site-infos.php';
+
 
 add_action('admin_menu', 'manual');
 
