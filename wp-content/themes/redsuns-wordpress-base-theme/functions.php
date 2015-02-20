@@ -164,7 +164,7 @@ function manual_do_site()
 {
     
     echo '<br /><br />';
-    echo '<iframe width="100%" height="600" src="<?php echo get_home_url(); ?>/docs/manual.pdf"></iframe>';
+    echo '<iframe width="100%" height="650" src="' . get_home_url() . '/docs/manual.pdf"></iframe>';
     
 }
 
