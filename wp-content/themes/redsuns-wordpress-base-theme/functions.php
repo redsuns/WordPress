@@ -181,3 +181,19 @@ function add_toolbar_items($admin_bar)
         ),
     ));
 }
+
+/**
+ * Obtém o Id de um post a partir de seu Slug
+ * 
+ * @param string $post_slug
+ * @return int
+ */
+function get_ID_by_slug($post_slug, $post_type = 'post')
+{
+    $post = get_page_by_path($post_slug, OBJECT, $post_type);
+    if ($post) {
+        return $post->ID;
+    } else {
+        return null;
+    }
+}
