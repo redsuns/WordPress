@@ -100,11 +100,8 @@ function wp_admin_bar_render() {
 function wp_admin_bar_wp_menu( $wp_admin_bar ) {
 	$wp_admin_bar->add_menu( array(
 		'id'    => 'wp-logo',
-		'title' => '<span class="ab-icon"></span>',
+		'title' => '<span class="ab-icon"></span><span class="screen-reader-text">' . __( 'About WordPress' ) . '</span>',
 		'href'  => self_admin_url( 'about.php' ),
-		'meta'  => array(
-			'title' => __('About WordPress'),
-		),
 	) );
 
 	if ( is_user_logged_in() ) {
@@ -113,7 +110,7 @@ function wp_admin_bar_wp_menu( $wp_admin_bar ) {
 			'parent' => 'wp-logo',
 			'id'     => 'about',
 			'title'  => __('About WordPress'),
-			'href'  => self_admin_url( 'about.php' ),
+			'href'   => self_admin_url( 'about.php' ),
 		) );
 	}
 
@@ -193,7 +190,6 @@ function wp_admin_bar_my_account_item( $wp_admin_bar ) {
 		'href'      => $profile_url,
 		'meta'      => array(
 			'class'     => $class,
-			'title'     => __('My Account'),
 		),
 	) );
 }
@@ -336,7 +332,7 @@ function wp_admin_bar_my_sites_menu( $wp_admin_bar ) {
 	$wp_admin_bar->add_menu( array(
 		'id'    => 'my-sites',
 		'title' => __( 'My Sites' ),
-		'href'  => admin_url( 'my-sites.php' ),
+		'href'  => get_admin_url( $wp_admin_bar->user->active_blog->blog_id, 'my-sites.php' ),
 	) );
 
 	if ( is_super_admin() ) {
@@ -604,9 +600,6 @@ function wp_admin_bar_new_content_menu( $wp_admin_bar ) {
 		'id'    => 'new-content',
 		'title' => $title,
 		'href'  => admin_url( current( array_keys( $actions ) ) ),
-		'meta'  => array(
-			'title' => _x( 'Add New', 'admin bar menu group label' ),
-		),
 	) );
 
 	foreach ( $actions as $link => $action ) {
@@ -679,10 +672,10 @@ function wp_admin_bar_appearance_menu( $wp_admin_bar ) {
 	}
 
 	if ( current_theme_supports( 'widgets' )  ) {
-		$wp_admin_bar->add_menu( array( 
-			'parent' => 'appearance', 
-			'id'     => 'widgets', 
-			'title'  => __( 'Widgets' ), 
+		$wp_admin_bar->add_menu( array(
+			'parent' => 'appearance',
+			'id'     => 'widgets',
+			'title'  => __( 'Widgets' ),
 			'href'   => admin_url( 'widgets.php' ),
 			'meta'   => array(
 				'class' => 'hide-if-customize',
@@ -690,10 +683,10 @@ function wp_admin_bar_appearance_menu( $wp_admin_bar ) {
 		) );
 
 		if ( current_user_can( 'customize' ) ) {
-			$wp_admin_bar->add_menu( array( 
-				'parent' => 'appearance', 
-				'id'     => 'customize-widgets', 
-				'title'  => __( 'Widgets' ), 
+			$wp_admin_bar->add_menu( array(
+				'parent' => 'appearance',
+				'id'     => 'customize-widgets',
+				'title'  => __( 'Widgets' ),
 				'href'   => add_query_arg( urlencode( 'autofocus[panel]' ), 'widgets', $customize_url ), // urlencode() needed due to #16859
 				'meta'   => array(
 					'class' => 'hide-if-no-customize',
@@ -795,6 +788,7 @@ function wp_admin_bar_search_menu( $wp_admin_bar ) {
 
 	$form  = '<form action="' . esc_url( home_url( '/' ) ) . '" method="get" id="adminbarsearch">';
 	$form .= '<input class="adminbar-input" name="s" id="adminbar-search" type="text" value="" maxlength="150" />';
+	$form .= '<label for="adminbar-search" class="screen-reader-text">' . __( 'Search' ) . '</label>';
 	$form .= '<input type="submit" class="adminbar-button" value="' . __('Search') . '"/>';
 	$form .= '</form>';
 

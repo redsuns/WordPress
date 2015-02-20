@@ -2424,13 +2424,13 @@ function get_comments_pagenum_link( $pagenum = 1, $max_page = 0 ) {
 	if ( 'newest' == get_option('default_comments_page') ) {
 		if ( $pagenum != $max_page ) {
 			if ( $wp_rewrite->using_permalinks() )
-				$result = user_trailingslashit( trailingslashit($result) . 'comment-page-' . $pagenum, 'commentpaged');
+				$result = user_trailingslashit( trailingslashit($result) . $wp_rewrite->comments_pagination_base . '-' . $pagenum, 'commentpaged');
 			else
 				$result = add_query_arg( 'cpage', $pagenum, $result );
 		}
 	} elseif ( $pagenum > 1 ) {
 		if ( $wp_rewrite->using_permalinks() )
-			$result = user_trailingslashit( trailingslashit($result) . 'comment-page-' . $pagenum, 'commentpaged');
+			$result = user_trailingslashit( trailingslashit($result) . $wp_rewrite->comments_pagination_base . '-' . $pagenum, 'commentpaged');
 		else
 			$result = add_query_arg( 'cpage', $pagenum, $result );
 	}
@@ -2573,7 +2573,7 @@ function paginate_comments_links($args = array()) {
 		'add_fragment' => '#comments'
 	);
 	if ( $wp_rewrite->using_permalinks() )
-		$defaults['base'] = user_trailingslashit(trailingslashit(get_permalink()) . 'comment-page-%#%', 'commentpaged');
+		$defaults['base'] = user_trailingslashit(trailingslashit(get_permalink()) . $wp_rewrite->comments_pagination_base . '-%#%', 'commentpaged');
 
 	$args = wp_parse_args( $args, $defaults );
 	$page_links = paginate_links( $args );
@@ -3482,7 +3482,7 @@ function get_avatar_data( $id_or_email, $args = null ) {
 	$args = apply_filters( 'pre_get_avatar_data', $args, $id_or_email );
 
 	if ( isset( $args['url'] ) && ! is_null( $args['url'] ) ) {
-		/** This filter is documented in src/wp-includes/link-template.php */
+		/** This filter is documented in wp-includes/link-template.php */
 		return apply_filters( 'get_avatar_data', $args, $id_or_email );
 	}
 
@@ -3519,7 +3519,7 @@ function get_avatar_data( $id_or_email, $args = null ) {
 		$allowed_comment_types = apply_filters( 'get_avatar_comment_types', array( 'comment' ) );
 		if ( ! empty( $id_or_email->comment_type ) && ! in_array( $id_or_email->comment_type, (array) $allowed_comment_types ) ) {
 			$args['url'] = false;
-			/** This filter is documented in src/wp-includes/link-template.php */
+			/** This filter is documented in wp-includes/link-template.php */
 			return apply_filters( 'get_avatar_data', $args, $id_or_email );
 		}
 
