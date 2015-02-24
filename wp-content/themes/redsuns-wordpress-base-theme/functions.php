@@ -197,3 +197,37 @@ function get_ID_by_slug($post_slug, $post_type = 'post')
         return null;
     }
 }
+
+/**
+ * Altera a logo do login para o admin
+ */
+function redsuns_login_logo() { ?>
+    <style type="text/css">
+        body.login div#login h1 a {
+            background-image: url(<?php echo get_stylesheet_directory_uri(); ?>/img/logo-redsuns.png);
+            -webkit-background-size: 107px;
+            background-size: 107px;
+        }
+    </style>
+<?php }
+add_action( 'login_enqueue_scripts', 'redsuns_login_logo' );
+
+/**
+ * Altera a URL para o login do admin
+ * 
+ * @return string
+ */
+function redusns_login_logo_url() {
+    return 'http://www.redsuns.com.br';
+}
+add_filter( 'login_headerurl', 'redusns_login_logo_url' );
+
+/**
+ * Altera o título do link para o login do admin
+ * 
+ * @return string
+ */
+function redsuns_login_logo_url_title() {
+    return 'Redsuns Design e Tecnologia';
+}
+add_filter( 'login_headertitle', 'redsuns_login_logo_url_title' );
