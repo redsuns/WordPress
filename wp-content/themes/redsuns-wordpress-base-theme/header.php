@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/css/bootstrap.min.css">
         <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/style.css">
+        <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/theme.css">
         <link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri();?>/css/default.css" />
         <link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri();?>/css/component.css" />
         <link href='http://fonts.googleapis.com/css?family=Lato:400,300,700' rel='stylesheet' type='text/css'>
