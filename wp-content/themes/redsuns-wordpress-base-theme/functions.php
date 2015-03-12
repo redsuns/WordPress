@@ -117,6 +117,12 @@ function redsuns_wordpress_base_theme_scripts() {
 }
 add_action( 'wp_enqueue_scripts', 'redsuns_wordpress_base_theme_scripts' );
 
+
+/**
+ *  Definindo constantes
+ */
+require get_template_directory() . '/inc/constants.php';
+
 /**
  * Implement the Custom Header feature.
  */
@@ -125,32 +131,44 @@ add_action( 'wp_enqueue_scripts', 'redsuns_wordpress_base_theme_scripts' );
 /**
  * Custom template tags for this theme.
  */
-require get_template_directory() . '/inc/template-tags.php';
+require TEMPLATE_DIRECTORY . '/inc/template-tags.php';
 
 /**
  * Custom functions that act independently of the theme templates.
  */
-require get_template_directory() . '/inc/extras.php';
+require TEMPLATE_DIRECTORY . '/inc/extras.php';
 
 /**
  * Customizer additions.
  */
-require get_template_directory() . '/inc/customizer.php';
+require TEMPLATE_DIRECTORY . '/inc/customizer.php';
 
 /**
  * Load Jetpack compatibility file.
  */
-require get_template_directory() . '/inc/jetpack.php';
+require TEMPLATE_DIRECTORY . '/inc/jetpack.php';
 
 /**
  * Fragmentação de URL
  */
-require get_template_directory() . '/inc/url-fragmentation.php';
+require TEMPLATE_DIRECTORY . '/inc/url-fragmentation.php';
 
 /**
  * Página de opções do painel administrativo
  */
-require get_template_directory() . '/inc/site-infos.php';
+require TEMPLATE_DIRECTORY . '/inc/site-infos.php';
+
+/**
+ * Os tipos de posts customizados
+ */
+require TEMPLATE_DIRECTORY . '/inc/custom-post-types.php';
+
+
+/**
+ * Rewrites customizados, utilize se necessário
+ */
+require TEMPLATE_DIRECTORY . '/inc/custom-rewrite.php';
+
 
 
 add_action('admin_menu', 'manual');
@@ -164,7 +182,7 @@ function manual_do_site()
 {
     
     echo '<br /><br />';
-    echo '<iframe width="100%" height="650" src="' . get_home_url() . '/docs/manual.pdf"></iframe>';
+    echo '<iframe width="100%" height="650" src="' . HOME_URL . '/docs/manual.pdf"></iframe>';
     
 }
 
@@ -175,7 +193,7 @@ function add_toolbar_items($admin_bar)
     $admin_bar->add_menu(array(
         'id' => 'manual',
         'title' => 'Manual do Site',
-        'href' => get_home_url() . '/wp-admin/admin.php?page=manual_do_site',
+        'href' => HOME_URL . '/wp-admin/admin.php?page=manual_do_site',
         'meta' => array(
             'title' => __('Manual do Site'),
         ),
@@ -204,7 +222,7 @@ function get_ID_by_slug($post_slug, $post_type = 'post')
 function redsuns_login_logo() { ?>
     <style type="text/css">
         body.login div#login h1 a {
-            background-image: url(<?php echo get_stylesheet_directory_uri(); ?>/img/logo-redsuns.png);
+            background-image: url(<?php echo TEMPLATE_DIRECTORY_URI; ?>/img/logo-redsuns.png);
             -webkit-background-size: 107px;
             background-size: 107px;
         }

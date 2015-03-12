@@ -16,14 +16,14 @@
 
         <title><?php wp_title('|', true, 'right'); ?> <?php bloginfo('name') ?></title>
 
-        <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/css/bootstrap.min.css">
-        <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/css/bootstrap-theme.min.css">
-        <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/style.css">
-        <link rel="stylesheet" href="<?php echo get_template_directory_uri();?>/theme.css">
-        <link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri();?>/css/default.css" />
-        <link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri();?>/css/component.css" />
+        <link rel="stylesheet" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/css/bootstrap.min.css">
+        <link rel="stylesheet" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/style.css">
+        <link rel="stylesheet" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/theme.css">
+        <link rel="stylesheet" type="text/css" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/css/default.css" />
+        <link rel="stylesheet" type="text/css" href="<?php echo TEMPLATE_DIRECTORY_URI;?>/css/component.css" />
         <link href='http://fonts.googleapis.com/css?family=Lato:400,300,700' rel='stylesheet' type='text/css'>
-        <script src="<?php echo get_template_directory_uri();?>/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="<?php echo TEMPLATE_DIRECTORY_URI;?>/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
         
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
