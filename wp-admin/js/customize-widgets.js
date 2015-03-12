@@ -685,10 +685,10 @@
 
 					if ( isMoveUp ) {
 						self.moveUp();
-						$( '#screen-reader-messages' ).text( l10n.widgetMovedUp );
+						wp.a11y.speak( l10n.widgetMovedUp );
 					} else {
 						self.moveDown();
-						$( '#screen-reader-messages' ).text( l10n.widgetMovedDown );
+						wp.a11y.speak( l10n.widgetMovedDown );
 					}
 
 					$( this ).focus(); // re-focus after the container was moved
@@ -1028,7 +1028,11 @@
 			}
 			data += '&' + $widgetContent.find( '~ :input' ).serialize();
 
+			if ( this._previousUpdateRequest ) {
+				this._previousUpdateRequest.abort();
+			}
 			jqxhr = $.post( wp.ajax.settings.url, data );
+			this._previousUpdateRequest = jqxhr;
 
 			jqxhr.done( function( r ) {
 				var message, sanitizedForm,	$sanitizedInputs, hasSameInputsInResponse,
@@ -1709,20 +1713,20 @@
 		},
 
 		/**
+		 * Get the widget_form Customize controls associated with the current sidebar.
+		 *
+		 * @since 3.9
 		 * @return {wp.customize.controlConstructor.widget_form[]}
 		 */
 		getWidgetFormControls: function() {
-			var formControls;
+			var formControls = [];
 
-			formControls = _( this.setting() ).map( function( widgetId ) {
+			_( this.setting() ).each( function( widgetId ) {
 				var settingId = widgetIdToSettingId( widgetId ),
 					formControl = api.control( settingId );
-
-				if ( ! formControl ) {
-					return;
+				if ( formControl ) {
+					formControls.push( formControl );
 				}
-
-				return formControl;
 			} );
 
 			return formControls;

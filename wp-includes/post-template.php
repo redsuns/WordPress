@@ -172,7 +172,14 @@ function get_the_title( $post = 0 ) {
  * @param int|WP_Post $id Optional. Post ID or post object.
  */
 function the_guid( $id = 0 ) {
-	echo esc_url( get_the_guid( $id ) );
+	/**
+	 * Filter the escaped Global Unique Identifier (guid) of the post.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param string $post_guid Escaped Global Unique Identifier (guid) of the post.
+	 */
+	echo apply_filters( 'the_guid', get_the_guid( $id ) );
 }
 
 /**
@@ -1131,18 +1138,17 @@ function wp_list_pages( $args = '' ) {
  * @since 2.7.0
  *
  * @param array|string $args {
- *     Optional. Arguments to generate a page menu. {@see wp_list_pages()}
- *     for additional arguments.
+ *     Optional. Arguments to generate a page menu. See wp_list_pages() for additional arguments.
  *
- * @type string          $sort_column How to short the list of pages. Accepts post column names.
- *                                    Default 'menu_order, post_title'.
- * @type string          $menu_class  Class to use for the div ID containing the page list. Default 'menu'.
- * @type bool            $echo        Whether to echo the list or return it. Accepts true (echo) or false (return).
- *                                    Default true.
- * @type string          $link_before The HTML or text to prepend to $show_home text. Default empty.
- * @type string          $link_after  The HTML or text to append to $show_home text. Default empty.
- * @type int|bool|string $show_home   Whether to display the link to the home page. Can just enter the text
- *                                    you'd like shown for the home link. 1|true defaults to 'Home'.
+ *     @type string          $sort_column How to short the list of pages. Accepts post column names.
+ *                                        Default 'menu_order, post_title'.
+ *     @type string          $menu_class  Class to use for the div ID containing the page list. Default 'menu'.
+ *     @type bool            $echo        Whether to echo the list or return it. Accepts true (echo) or false (return).
+ *                                        Default true.
+ *     @type string          $link_before The HTML or text to prepend to $show_home text. Default empty.
+ *     @type string          $link_after  The HTML or text to append to $show_home text. Default empty.
+ *     @type int|bool|string $show_home   Whether to display the link to the home page. Can just enter the text
+ *                                        you'd like shown for the home link. 1|true defaults to 'Home'.
  * }
  * @return string html menu
  */
@@ -1551,7 +1557,7 @@ function prepend_attachment($content) {
 	if ( empty($post->post_type) || $post->post_type != 'attachment' )
 		return $content;
 
-	if ( 0 === strpos( $post->post_mime_type, 'video' ) ) {
+	if ( wp_attachment_is( 'video', $post ) ) {
 		$meta = wp_get_attachment_metadata( get_the_ID() );
 		$atts = array( 'src' => wp_get_attachment_url() );
 		if ( ! empty( $meta['width'] ) && ! empty( $meta['height'] ) ) {
@@ -1562,7 +1568,7 @@ function prepend_attachment($content) {
 			$atts['poster'] = wp_get_attachment_url( get_post_thumbnail_id() );
 		}
 		$p = wp_video_shortcode( $atts );
-	} elseif ( 0 === strpos( $post->post_mime_type, 'audio' ) ) {
+	} elseif ( wp_attachment_is( 'audio', $post ) ) {
 		$p = wp_audio_shortcode( array( 'src' => wp_get_attachment_url() ) );
 	} else {
 		$p = '<p class="attachment">';

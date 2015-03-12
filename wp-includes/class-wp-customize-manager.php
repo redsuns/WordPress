@@ -1,6 +1,14 @@
 <?php
 /**
- * Customize Manager.
+ * WordPress Customize Manager classes
+ *
+ * @package WordPress
+ * @subpackage Customize
+ * @since 3.4.0
+ */
+
+/**
+ * Customize Manager class.
  *
  * Bootstraps the Customize experience on the server-side.
  *
@@ -10,8 +18,6 @@
  * Serves as a factory for Customize Controls and Settings, and
  * instantiates default Customize Controls and Settings.
  *
- * @package WordPress
- * @subpackage Customize
  * @since 3.4.0
  */
 final class WP_Customize_Manager {
@@ -314,6 +320,9 @@ final class WP_Customize_Manager {
 	 * @return WP_Theme
 	 */
 	public function theme() {
+		if ( ! $this->theme ) {
+			$this->theme = wp_get_theme();
+		}
 		return $this->theme;
 	}
 
@@ -492,6 +501,7 @@ final class WP_Customize_Manager {
 		add_action( 'wp', array( $this, 'customize_preview_override_404_status' ) );
 		add_action( 'wp_head', array( $this, 'customize_preview_base' ) );
 		add_action( 'wp_head', array( $this, 'customize_preview_html5' ) );
+		add_action( 'wp_head', array( $this, 'customize_preview_loading_style' ) );
 		add_action( 'wp_footer', array( $this, 'customize_preview_settings' ), 20 );
 		add_action( 'shutdown', array( $this, 'customize_preview_signature' ), 1000 );
 		add_filter( 'wp_die_handler', array( $this, 'remove_preview_signature' ) );
@@ -534,7 +544,7 @@ final class WP_Customize_Manager {
 	}
 
 	/**
-	 * Print a workaround to handle HTML5 tags in IE < 9
+	 * Print a workaround to handle HTML5 tags in IE < 9.
 	 *
 	 * @since 3.4.0
 	 */
@@ -552,6 +562,25 @@ final class WP_Customize_Manager {
 	}
 
 	/**
+	 * Print CSS for loading indicators for the Customizer preview.
+	 *
+	 * @since 4.2.0
+	 */
+	public function customize_preview_loading_style() {
+		?><style>
+			body.wp-customizer-unloading {
+				opacity: 0.25;
+				cursor: progress !important;
+				-webkit-transition: opacity 0.5s;
+				transition: opacity 0.5s;
+			}
+			body.wp-customizer-unloading * {
+				pointer-events: none !important;
+			}
+		</style><?php
+	}
+
+	/**
 	 * Print JavaScript settings for preview frame.
 	 *
 	 * @since 3.4.0
@@ -563,6 +592,9 @@ final class WP_Customize_Manager {
 			'activePanels' => array(),
 			'activeSections' => array(),
 			'activeControls' => array(),
+			'l10n' => array(
+				'loading'  => __( 'Loading ...' ),
+			),
 		);
 
 		if ( 2 == $this->nonce_tick ) {
@@ -1107,9 +1139,42 @@ final class WP_Customize_Manager {
 
 		/* Control Types (custom control classes) */
 		$this->register_control_type( 'WP_Customize_Color_Control' );
+		$this->register_control_type( 'WP_Customize_Media_Control' );
 		$this->register_control_type( 'WP_Customize_Upload_Control' );
 		$this->register_control_type( 'WP_Customize_Image_Control' );
 		$this->register_control_type( 'WP_Customize_Background_Image_Control' );
+		$this->register_control_type( 'WP_Customize_Theme_Control' );
+
+		/* Themes */
+
+		$this->add_section( new WP_Customize_Themes_Section( $this, 'themes', array(
+			'title' => sprintf( __( 'Theme: %s' ), $this->theme()->display('Name') ),
+			'capability' => 'switch_themes',
+			'priority' => 0,
+		) ) );
+
+		// Themes Setting (unused - the theme is considerably more fundamental to the Customizer experience).
+		$this->add_setting( new WP_Customize_Filter_Setting( $this, 'active_theme', array(
+			'capability' => 'switch_themes',
+		) ) );
+
+		require_once( ABSPATH . 'wp-admin/includes/theme.php' );
+
+		// Theme Controls.
+		$themes = wp_prepare_themes_for_js();
+		foreach ( $themes as $theme ) {
+			$theme_id = 'theme_' . $theme['id'];
+			$this->add_control( new WP_Customize_Theme_Control( $this, $theme_id, array(
+				'theme' => $theme,
+				'section' => 'themes',
+				'settings' => 'active_theme',
+			) ) );
+		}
+
+		$this->add_control( new WP_Customize_New_Theme_Control( $this, 'add_theme', array(
+			'section' => 'themes',
+			'settings' => 'active_theme',
+		) ) );
 
 		/* Site Title & Tagline */
 

@@ -597,7 +597,7 @@ EditAttachments = MediaFrame.extend({
 module.exports = EditAttachments;
 
 },{"../../controllers/edit-attachment-metadata.js":1,"../attachment/details-two-column.js":4,"../edit-image-details.js":8}],10:[function(require,module,exports){
-/*globals wp, _, jQuery, Backbone */
+/*globals wp, _, Backbone */
 
 /**
  * wp.media.view.MediaFrame.Manage
@@ -621,7 +621,7 @@ var MediaFrame = wp.media.view.MediaFrame,
 
 	Router = require( '../../routers/manage.js' ),
 
-	$ = jQuery,
+	$ = Backbone.$,
 	Manage;
 
 Manage = MediaFrame.extend({
@@ -629,7 +629,6 @@ Manage = MediaFrame.extend({
 	 * @global wp.Uploader
 	 */
 	initialize: function() {
-		var self = this;
 		_.defaults( this.options, {
 			title:     '',
 			modal:     false,
@@ -682,15 +681,39 @@ Manage = MediaFrame.extend({
 		this.createStates();
 		this.bindRegionModeHandlers();
 		this.render();
+		this.bindSearchHandler();
+	},
+
+	bindSearchHandler: function() {
+		var search = this.$( '#media-search-input' ),
+			currentSearch = this.options.container.data( 'search' ),
+			searchView = this.browserView.toolbar.get( 'search' ).$el,
+			listMode = this.$( '.view-list' ),
+
+			input  = _.debounce( function (e) {
+				var val = $( e.currentTarget ).val(),
+					url = '';
+
+				if ( val ) {
+					url += '?search=' + val;
+				}
+				this.gridRouter.navigate( this.gridRouter.baseUrl( url ) );
+			}, 1000 );
 
 		// Update the URL when entering search string (at most once per second)
-		$( '#media-search-input' ).on( 'input', _.debounce( function(e) {
-			var val = $( e.currentTarget ).val(), url = '';
-			if ( val ) {
-				url += '?search=' + val;
+		search.on( 'input', _.bind( input, this ) );
+		searchView.val( currentSearch ).trigger( 'input' );
+
+		this.gridRouter.on( 'route:search', function () {
+			var href = window.location.href;
+			if ( href.indexOf( 'mode=' ) > -1 ) {
+				href = href.replace( /mode=[^&]+/g, 'mode=list' );
+			} else {
+				href += href.indexOf( '?' ) > -1 ? '&mode=list' : '?mode=list';
 			}
-			self.gridRouter.navigate( self.gridRouter.baseUrl( url ) );
-		}, 1000 ) );
+			href = href.replace( 'search=', 's=' );
+			listMode.prop( 'href', href );
+		} );
 	},
 
 	/**

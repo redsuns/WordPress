@@ -2267,6 +2267,9 @@ function wp_ajax_save_attachment() {
 	if ( 'attachment' != $post['post_type'] )
 		wp_send_json_error();
 
+	if ( isset( $changes['parent'] ) )
+		$post['post_parent'] = $changes['parent'];
+
 	if ( isset( $changes['title'] ) )
 		$post['post_title'] = $changes['title'];
 
@@ -2287,7 +2290,7 @@ function wp_ajax_save_attachment() {
 		}
 	}
 
-	if ( 0 === strpos( $post['post_mime_type'], 'audio/' ) ) {
+	if ( wp_attachment_is( 'audio', $post['ID'] ) ) {
 		$changed = false;
 		$id3data = wp_get_attachment_metadata( $post['ID'] );
 		if ( ! is_array( $id3data ) ) {
@@ -2445,7 +2448,7 @@ function wp_ajax_send_attachment_to_editor() {
 		$caption = isset( $attachment['post_excerpt'] ) ? $attachment['post_excerpt'] : '';
 		$title = ''; // We no longer insert title tags into <img> tags, as they are redundant.
 		$html = get_image_send_to_editor( $id, $caption, $title, $align, $url, (bool) $rel, $size, $alt );
-	} elseif ( 'video' === substr( $post->post_mime_type, 0, 5 ) || 'audio' === substr( $post->post_mime_type, 0, 5 )  ) {
+	} elseif ( wp_attachment_is( 'video', $post ) || wp_attachment_is( 'audio', $post )  ) {
 		$html = stripslashes_deep( $_POST['html'] );
 	}
 
@@ -2705,13 +2708,21 @@ function wp_ajax_parse_embed() {
 	}
 
 	$shortcode = wp_unslash( $_POST['shortcode'] );
-	$url = str_replace( '[embed]', '', str_replace( '[/embed]', '', $shortcode ) );
+
+	preg_match( '/' . get_shortcode_regex() . '/s', $shortcode, $matches );
+	$atts = shortcode_parse_atts( $matches[3] );
+	if ( ! empty( $matches[5] ) ) {
+		$url = $matches[5];
+	} elseif ( ! empty( $atts['src'] ) ) {
+		$url = $atts['src'];
+	}
+
 	$parsed = false;
 	setup_postdata( $post );
 
 	$wp_embed->return_false_on_fail = true;
 
-	if ( is_ssl() && preg_match( '%^\\[embed[^\\]]*\\]http://%i', $shortcode ) ) {
+	if ( is_ssl() && 0 === strpos( $url, 'http://' ) ) {
 		// Admin is ssl and the user pasted non-ssl URL.
 		// Check if the provider supports ssl embeds and use that for the preview.
 		$ssl_shortcode = preg_replace( '%^(\\[embed[^\\]]*\\])http://%i', '$1https://', $shortcode );
@@ -2764,7 +2775,8 @@ function wp_ajax_parse_embed() {
 	}
 
 	wp_send_json_success( array(
-		'body' => $parsed
+		'body' => $parsed,
+		'attr' => $wp_embed->last_attr
 	) );
 }
 
@@ -2901,6 +2913,10 @@ function wp_ajax_install_plugin() {
 	if ( is_wp_error( $result ) ) {
 		$status['error'] = $result->get_error_message();
  		wp_send_json_error( $status );
+	} else if ( is_null( $result ) ) {
+		$status['errorCode'] = 'unable_to_connect_to_filesystem';
+		$status['error'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.' );
+		wp_send_json_error( $status );
 	}
 
 	$plugin_status = install_plugin_install_status( $api );
@@ -2942,15 +2958,40 @@ function wp_ajax_update_plugin() {
 
 	$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
 	$result = $upgrader->bulk_upgrade( array( $plugin ) );
-
 	if ( is_array( $result ) ) {
-		$result = $result[ $plugin ];
-	}
-
-	if ( is_wp_error( $result ) ) {
+		wp_send_json_success( $status );
+	} else if ( is_wp_error( $result ) ) {
 		$status['error'] = $result->get_error_message();
  		wp_send_json_error( $status );
+	} else if ( is_bool( $result ) && ! $result ) {
+		$status['errorCode'] = 'unable_to_connect_to_filesystem';
+		$status['error'] = __( 'Unable to connect to the filesystem. Please confirm your credentials.' );
+		wp_send_json_error( $status );
+	}
+}
+
+/**
+ * AJAX handler for saving a post from Ptrss This.
+ *
+ * @since 4.2.0
+ */
+function wp_ajax_press_this_save_post() {
+	if ( empty( $GLOBALS['wp_press_this'] ) ) {
+		include( ABSPATH . 'wp-admin/includes/class-wp-press-this.php' );
 	}
 
-	wp_send_json_success( $status );
+	$GLOBALS['wp_press_this']->save_post();
+}
+
+/**
+ * AJAX handler for creating new category from Ptrss This.
+ *
+ * @since 4.2.0
+ */
+function wp_ajax_press_this_add_category() {
+	if ( empty( $GLOBALS['wp_press_this'] ) ) {
+		include( ABSPATH . 'wp-admin/includes/class-wp-press-this.php' );
+	}
+
+	$GLOBALS['wp_press_this']->add_category();
 }

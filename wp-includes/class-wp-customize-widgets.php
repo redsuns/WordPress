@@ -1,12 +1,20 @@
 <?php
 /**
- * Customize Widgets Class
- *
- * Implements widget management in the Customizer.
+ * WordPress Customize Widgets classes
  *
  * @package WordPress
  * @subpackage Customize
  * @since 3.9.0
+ */
+
+/**
+ * Customize Widgets class.
+ *
+ * Implements widget management in the Customizer.
+ *
+ * @since 3.9.0
+ *
+ * @see WP_Customize_Manager
  */
 final class WP_Customize_Widgets {
 
@@ -208,6 +216,7 @@ final class WP_Customize_Widgets {
 		$sidebars_widgets = $this->old_sidebars_widgets;
 		$sidebars_widgets = retrieve_widgets( 'customize' );
 		add_filter( 'option_sidebars_widgets', array( $this, 'filter_option_sidebars_widgets_for_theme_switch' ), 1 );
+		unset( $GLOBALS['_wp_sidebars_widgets'] ); // reset global cache var used by wp_get_sidebars_widgets()
 	}
 
 	/**
@@ -324,6 +333,7 @@ final class WP_Customize_Widgets {
 			$setting_id = 'old_sidebars_widgets_data';
 			$setting_args = $this->get_setting_args( $setting_id, array(
 				'type' => 'global_variable',
+				'dirty' => true,
 			) );
 			$this->manager->add_setting( $setting_id, $setting_args );
 		}
@@ -348,6 +358,9 @@ final class WP_Customize_Widgets {
 				$setting_id   = sprintf( 'sidebars_widgets[%s]', $sidebar_id );
 				$setting_args = $this->get_setting_args( $setting_id );
 				if ( ! $this->manager->get_setting( $setting_id ) ) {
+					if ( ! $this->manager->is_theme_active() ) {
+						$setting_args['dirty'] = true;
+					}
 					$this->manager->add_setting( $setting_id, $setting_args );
 				}
 				$new_setting_ids[] = $setting_id;

@@ -2976,9 +2976,9 @@ function wp_enqueue_media( $args = array() ) {
 
 		$thumbnail_support = current_theme_supports( 'post-thumbnails', $post->post_type ) && post_type_supports( $post->post_type, 'thumbnail' );
 		if ( ! $thumbnail_support && 'attachment' === $post->post_type && $post->post_mime_type ) {
-			if ( 0 === strpos( $post->post_mime_type, 'audio/' ) ) {
+			if ( wp_attachment_is( 'audio', $post ) ) {
 				$thumbnail_support = post_type_supports( 'attachment:audio', 'thumbnail' ) || current_theme_supports( 'post-thumbnails', 'attachment:audio' );
-			} elseif ( 0 === strpos( $post->post_mime_type, 'video/' ) ) {
+			} elseif ( wp_attachment_is( 'video', $post ) ) {
 				$thumbnail_support = post_type_supports( 'attachment:video', 'thumbnail' ) || current_theme_supports( 'post-thumbnails', 'attachment:video' );
 			}
 		}
@@ -3220,16 +3220,22 @@ function get_attached_media( $type, $post = 0 ) {
  */
 function get_media_embedded_in_content( $content, $types = null ) {
 	$html = array();
-	$allowed_media_types = array( 'audio', 'video', 'object', 'embed', 'iframe' );
+
+	$allowed_media_types = apply_filters( 'get_media_embedded_in_content_allowed', array( 'audio', 'video', 'object', 'embed', 'iframe' ) );
+
 	if ( ! empty( $types ) ) {
-		if ( ! is_array( $types ) )
+		if ( ! is_array( $types ) ) {
 			$types = array( $types );
+		}
+
 		$allowed_media_types = array_intersect( $allowed_media_types, $types );
 	}
 
-	foreach ( $allowed_media_types as $tag ) {
-		if ( preg_match( '#' . get_tag_regex( $tag ) . '#', $content, $matches ) ) {
-			$html[] = $matches[0];
+	$tags = implode( '|', $allowed_media_types );
+
+	if ( preg_match_all( '#<(?P<tag>' . $tags . ')[^<]*?(?:>[\s\S]*?<\/(?P=tag)>|\s*\/>)#', $content, $matches ) ) {
+		foreach ( $matches[0] as $match ) {
+			$html[] = $match;
 		}
 	}
 
